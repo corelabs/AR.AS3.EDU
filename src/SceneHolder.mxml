@@ -1,0 +1,898 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - SceneHolder [AR_Multi_Examples]
+ -
+ - 
+ - @author		CoreLabs
+ -->
+ 
+<mx:UIComponent xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*" width="640" height="480">
+		<mx:Script>
+		<![CDATA[
+
+			import org.papervision3d.materials.WireframeMaterial;
+			import org.papervision3d.objects.primitives.Plane;
+			import org.papervision3d.core.math.Number3D;
+			import away3d.materials.WhiteShadingBitmapMaterial;
+			import mx.formatters.SwitchSymbolFormatter;
+			import mx.preloaders.Preloader;
+			import org.papervision3d.events.FileLoadEvent;
+			import mx.effects.IEffectInstance;
+			import mx.controls.Label;
+			import mx.controls.Image;
+			import mx.controls.SWFLoader;
+			import org.papervision3d.objects.primitives.Sphere;
+			import mx.controls.Alert;
+			import away3d.loaders.utils.MaterialLibrary;
+			import sandy.materials.Material;
+			import org.papervision3d.materials.BitmapFileMaterial;
+			import away3d.loaders.Loader3D;
+			import org.ascollada.fx.DaeTexture;
+			
+			import org.papervision3d.materials.ColorMaterial;
+			import org.papervision3d.materials.utils.MaterialsList;
+			import org.papervision3d.materials.BitmapMaterial;
+			import mx.core.WindowedApplication;
+			import com.transmote.flar.FLARManager;
+			import com.transmote.flar.marker.FLARMarker;
+			import com.transmote.flar.marker.FLARMarkerEvent;
+			import com.transmote.flar.utils.geom.FLARPVGeomUtils;
+			
+			import flash.display.Sprite;
+			import flash.events.Event;
+			
+			import org.libspark.flartoolkit.support.pv3d.FLARCamera3D;
+			import org.papervision3d.lights.PointLight3D;
+			import org.papervision3d.objects.DisplayObject3D;
+			import org.papervision3d.objects.parsers.DAE;
+			import org.papervision3d.render.LazyRenderEngine;
+			import org.papervision3d.scenes.Scene3D;
+			import org.papervision3d.view.Viewport3D;
+			
+			// CONSTANTS
+			private const NUM_MARKERS:Number = 18;
+			private const CONFIG_FILE:String = "resources/flar/modelNames.txt";
+			private const LINK:String = "http://";  
+			
+			// VARIABLES
+			private var flarManager:FLARManager;
+			
+			//Scene
+			private var scene3D:Scene3D;
+			private var camera3D:FLARCamera3D;
+			private var viewport3D:Viewport3D;
+			private var renderEngine:LazyRenderEngine;
+			private var pointLight3D:PointLight3D;
+			
+			//Markers & models
+			private var activeMarker:FLARMarker;
+			private var activeMarkers:Array = new Array();
+			private var modelContainer:DisplayObject3D;
+			private var modelContainers:Array = new Array();
+			private var models:Array = new Array(); 
+			private var modelNames:Array = new Array(); //"modelName.dae"
+			private var modelTitles:Array = new Array(); //"modelName"
+			private var modelTextInfo:Array = new Array(); //Information about the model
+			
+			//Application
+			public var _parent:AR_Multi_Examples;
+			private var urlRequest:URLRequest;
+			private var urlLoader:URLLoader;
+			private var urlText:String;
+			
+			private var counter:Number = 0;
+			
+			private var joystick:Joystick = new Joystick();
+			
+			private var initx:Number = 0;
+			private var inity:Number = 0;
+			public var tension:Number = .5;
+			private var decay:Number = .5;
+			private var xSpeed:Number = 0;
+			private var ySpeed:Number = 0;
+			private var dragging:Boolean = false;
+			private var imageRotation:Image = new Image();
+			private var rotationTitle:Label = new Label();
+			private var similarPatterns:Array = new Array();
+			private var lastID:Number = -1;
+			
+			private var listeners:Number = 0;
+			private var firstTime:Boolean = true;
+			public var loaded:Boolean = false;
+			
+			private var showed:Boolean = false;
+			private var idShow:Number = -1;
+			/** variables para el preloader 
+			 * 
+			 * customPreloader es una clase importada de un  componente SWC creado en Flash
+			 * 
+			 * **/
+			public var ploader:customPreloader;
+			public var back:Image = new Image();
+						
+			
+			/**
+			 * Init setup  
+			 */
+			public function init():void{
+				if(firstTime){
+					Mouse.hide();
+					_parent.addChild(boxPreloader);
+					//creamos el preloader
+					ploader = new customPreloader();
+					//le aplicamos un filtro de sombra arrojada
+					ploader.filters = [new DropShadowFilter(4,45,0,0.5)];
+					//añadimos un listener para cuando que setearlo cuadno sea añadido a la escena
+					addEventListener(Event.ADDED_TO_STAGE, onAdded);
+					//añadimos el preloader a la escena
+					ploader.x = stage.stageWidth*0.5 - 134;
+					ploader.y = stage.stageHeight*0.5 - 37;
+					imgBackPreloader.addChild(ploader);
+					ploader.stop();
+					loadModelsNames();
+					AR_Example();
+				}else{
+					Mouse.show();
+					_parent.panelScene.visible = true;
+					_parent.imageHeader.visible = true;
+					ploader.visible = false;
+					imgBackPreloader.visible = false;				
+					imageRotation.load('../resources/assets/joystickBackground.jpg');
+					imageRotation.addEventListener(Event.COMPLETE, onImageLoadComplete);	
+					_parent.addChild(panelZoom);
+					_parent.addChild(panelPosition);
+					_parent.addChild(panelSimilar);
+				}	
+			}
+			
+			private function onAdded(e:Event):void
+			{
+				// stop the preloader animation and set the preloader position in the middle of the screen. 
+				ploader.stop();
+				//ploader.x = stage.stageWidth*0.5 - 134;
+				//ploader.y = stage.stageHeight*0.5 - 37;
+				ploader.x = 5;
+				ploader.y = 5;
+				imgBackPreloader.addChild(ploader);
+			}
+			
+			private function onImageLoadComplete(e:Event):void{
+				imageRotation.visible=true;
+				imageRotation.x = (panelZoom.x+panelZoom.width+10);
+				imageRotation.y = panelZoom.y;
+				rotationTitle.htmlText = "<b><font color='#5ED52B' size='9'>Rotation</font></b>";
+				rotationTitle.x = imageRotation.x+10;
+				rotationTitle.y = imageRotation.y;
+				_parent.addChild(imageRotation);
+				_parent.addChild(rotationTitle);
+				Interactivity3();
+				
+    			joystick.x = 102;
+				joystick.y = 108;
+				joystick.buttonMode = true;
+				imageRotation.addChild(joystick);
+			}
+			
+			private function onImagePreloadComplete(e:Event):void{
+				back.visible=true;
+				imageRotation.x = 0;
+				imageRotation.y = 0;
+				
+				_parent.addChild(back);
+				
+    			ploader.x = 2;
+				ploader.y = 2;
+				imgBackPreloader.addChild(ploader);
+			}
+			
+			
+			public function Interactivity3():void
+			{
+				initx = joystick.x+10;
+				inity = joystick.y;
+		
+				// Respond to mouse events
+				joystick.addEventListener(MouseEvent.MOUSE_DOWN,dragPressHandler);
+				stage.addEventListener(MouseEvent.MOUSE_UP,dragReleaseHandler);
+				
+				
+				
+				// Update screen every frame
+				addEventListener(Event.ENTER_FRAME,enterFrameHandler);
+			}
+			
+			private function enterFrameHandler(e:Event):void{
+				//trace('J', joystick.rotation);
+				
+				with( joystick )
+				{
+					if( dragging ) 
+					{
+						// Calculate the angle 
+						// of the joystick
+						var angle:Number = Math.atan2(root.mouseY-inity,root.mouseX-initx)/(Math.PI/180);
+						rotation = angle;
+						
+						with( knob ) 
+						{
+							// Rotate the knob inversely to 
+							// the rotation of the whole joystick
+							rotation = -angle;
+							
+							// Drag the joystick but constrain it 
+							// to a circle with a radius of 75
+							x = parent.mouseX;
+							y = parent.mouseY;
+							
+							if( x > 50 ){
+								x = 50;
+							}
+							if( x < -50 ){
+								x = -50;
+							}
+							if( y > 50 ){
+								y = 50;
+							}
+							if( y < -50 ){
+								y = -50;
+							}
+							trace('X', x);
+							trace('Y', y);
+							var model:DAE;
+							var actMarker:FLARMarker;
+							for (var i:Number = 0; i<modelNames.length; i++){
+								actMarker = activeMarkers[i];
+								if (actMarker || (i == idShow)){
+									model = models[i];
+									if((Math.abs(x) >= Math.abs(y)) && Math.abs(y) >= 15)
+										model.rotationZ += y/10;
+									if((Math.abs(y) > Math.abs(x)) && Math.abs(y) >= 15)
+										model.rotationX -= x/10;
+																				
+								}
+							}
+						}
+
+						// Scale the length of the joystick shaft
+						shaft.width = (knob.x-shaft.x);
+						//shaft.alpha = 1;
+					} 
+					else{
+						// Snap back to center when the joystick is released
+						xSpeed = -knob.x*tension+(xSpeed*decay);
+						ySpeed = -knob.y*tension+(ySpeed*decay);
+						knob.x += xSpeed;
+						knob.y += ySpeed;
+						shaft.alpha = 0;
+					}
+				}
+			}
+			protected function dragPressHandler(event:MouseEvent):void
+			{
+				dragging = true;
+			}
+			
+			protected function dragReleaseHandler(event:MouseEvent):void
+			{
+				dragging = false;
+			}
+			
+						
+			/**
+			 * Load all model names.
+			 */
+			private function loadModelsNames():void{
+				urlRequest = new URLRequest(CONFIG_FILE);
+				urlLoader = new URLLoader();
+				urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
+				urlLoader.load(urlRequest);
+				urlLoader.addEventListener(Event.COMPLETE, loadComplete);
+			}
+			
+			/**
+			 * Initialize FLARManager
+			 */
+			private function AR_Example():void {
+				// pass the path to the FLARManager xml config file into the FLARManager constructor.
+				// FLARManager creates and uses a FLARCameraSource by default.
+				// the image from the first detected camera will be used for marker detection.
+				this.flarManager = new FLARManager("resources/flar/flarConfig.xml");
+				
+				// add FLARManager.flarSource to the display list to display the video capture.
+				this.addChild(Sprite(this.flarManager.flarSource));
+				
+				// begin listening for FLARMarkerEvents.
+				this.flarManager.addEventListener(FLARMarkerEvent.MARKER_ADDED, this.onMarkerAdded);
+				this.flarManager.addEventListener(FLARMarkerEvent.MARKER_UPDATED, this.onMarkerUpdated);
+				this.flarManager.addEventListener(FLARMarkerEvent.MARKER_REMOVED, this.onMarkerRemoved);
+				
+				// wait for FLARManager to initialize before setting up Papervision3D environment.
+				this.flarManager.addEventListener(Event.INIT, this.onFlarManagerInited);
+			}
+			
+			private function onFlarManagerInited (evt:Event) :void {
+				trace("IN onFlarManagerInited")
+				this.flarManager.removeEventListener(Event.INIT, this.onFlarManagerInited);
+				
+				this.scene3D = new Scene3D();
+				
+				// initialize FLARCamera3D with parsed camera parameters.
+				this.camera3D = new FLARCamera3D(this.flarManager.cameraParams);
+				
+				this.viewport3D = new Viewport3D();
+				this.addChild(this.viewport3D);
+				
+				this.renderEngine = new LazyRenderEngine(this.scene3D, this.camera3D, this.viewport3D);
+				
+				this.pointLight3D = new PointLight3D();
+				this.pointLight3D.x = 1000;
+				this.pointLight3D.y = 1000;
+				this.pointLight3D.z = -1000;
+				
+				//load all DAE models
+				this.loadModels();			
+				this.addEventListener(Event.ENTER_FRAME, this.onEnterFrame);
+			}
+			
+			/**
+			 *  Load DAE models.
+			 */
+			private function loadModels(): void {
+				listeners = modelNames.length;
+				// load the model.
+				// (this model has to be scaled and rotated to fit the marker; every model is different.)
+				for (var i:Number = 0; i<modelNames.length; i++){	
+					var model:DAE = new DAE(true, "model"+i, true);
+					model.addEventListener(IOErrorEvent.IO_ERROR, loadModelError);
+					//model.load("../resources/assets/" + this.modelNames[i].toString(), mp);
+					model.load("../resources/assets/models/" + this.modelNames[i].toString());
+					model.addEventListener(FileLoadEvent.LOAD_COMPLETE, onModelLoadComplete);
+					model.rotationX = 90;
+					model.rotationZ = 90;
+					
+					
+					if(i >= 8){
+						switch(i){
+							case(8)://cctv
+								model.scale = 6;
+								break;
+							
+							case(9)://Pissa tower
+								model.scale = 10;
+								break;
+															
+							case(11)://Shanghai
+								model.scale = 2;
+								break;
+							
+							default:
+								model.scale = 5;
+								break;
+						}
+					}else{
+						model.scale = 20;}	
+					
+					this.models.push(model);
+					
+					// create a container for the model, that will accept matrix transformations.
+					var container:DisplayObject3D = new DisplayObject3D();
+					container.id = i;
+					container.addChild(model, "model"+i);
+					container.visible = false;
+					scene3D.addChild(container);
+					modelContainers.push(container);
+				}
+				panelInfo.visible = false;
+				_parent.addChild(panelInfo);
+				
+			}
+			
+			private function onModelLoadComplete(e:Event):void{
+				e.target.removeEventListener(FileLoadEvent.LOAD_COMPLETE, onModelLoadComplete);
+				listeners--;
+				//hacemos crecer la barra de progreso del preloader en funcion de la carga de los modelos
+				trace("%",(modelNames.length - listeners+1)*100/modelNames.length);
+				ploader.gotoAndStop(Math.ceil((modelNames.length - listeners+1)*100/modelNames.length));
+				
+				if(listeners == 0){
+					trace("MODELS LOAD COMPLETE!!!");
+					firstTime = false;
+					init();
+				}
+				
+			}
+			
+			private function loadModelError(event:IOErrorEvent):void{
+				event.target.removeEventListener(Event.COMPLETE, loadModelError);
+				var array:Array = event.text.split("/");
+				trace("ERROR: Can't load "+array[array.indexOf("models")+1]);
+				Alert.show("Sorry! Can't load "+array[array.indexOf("models")+1], "DAE LOAD ERROR");
+				listeners--;
+			}
+			
+			private function loadComplete(evt:Event):void{
+				var names:String = urlLoader.data;
+				modelNames = names.split(';');
+				loadModelsTextInfo(modelNames);
+			}
+			
+			/**
+			 * Load all models text information.
+			 */
+			private function loadModelsTextInfo(names:Array):void{
+				for(var i:Number = 0; i<names.length; i++){
+					//trace("NAME", (names[i].toString().split("."))[0]);
+					/*var loader:URLLoader = new URLLoader(new URLRequest("../resources/flar/documentation/"+(names[i].toString().split("."))[0]+".txt"));
+					loader.addEventListener(Event.COMPLETE, readComplete);*/
+					modelTitles[i] = new String((names[i].toString().split("."))[0]);
+					var urlRequest:URLRequest = new URLRequest("../resources/flar/documentation/"+modelTitles[i].toString()+".txt");
+					var urlLoader:URLLoader = new URLLoader();
+					urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadModelTextError);
+					urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
+					urlLoader.load(urlRequest);
+					urlLoader.addEventListener(Event.COMPLETE, readComplete);
+										
+				}
+				
+			}
+			
+			private function loadModelTextError(event:IOErrorEvent):void{
+				event.target.removeEventListener(Event.COMPLETE, loadModelTextError);
+				var array:Array = event.text.split("/");
+				trace("ERROR: Can't load "+array[array.indexOf("documentation")+1]);
+				Alert.show("Sorry! Can't load "+array[array.indexOf("documentation")+1], "DATA INFO ERROR");
+			}
+			
+			private function readComplete(evt:Event):void{
+				//trace("INFO MODEL TEXT", new String(urlLoader.data));
+				evt.target.removeEventListener(Event.COMPLETE, readComplete);
+				modelTextInfo[counter] = "<p align='justify'>"+new String(evt.target.data)+"</p>";
+				counter++;
+			}
+			
+			private function readLink(url:String):void{
+				var loader:URLLoader = new URLLoader(new URLRequest(url));
+				loader.addEventListener(Event.COMPLETE, loadLinkComplete);
+			}
+			
+			private function loadLinkComplete(event:Event):void{
+				event.target.removeEventListener(Event.COMPLETE, loadModelTextError);
+				//trace("WEB",event.target.data);
+				modelTextInfo[counter] = event.target.data;
+				trace("WEB",modelTextInfo[counter]);
+			}
+			
+			/**
+			 * Add model on marked detected.
+			 */
+			private function onMarkerAdded (evt:FLARMarkerEvent) :void {
+				trace("["+evt.marker.patternId+"] added");
+				var namePatt:String;
+				var container:DisplayObject3D = new DisplayObject3D();
+				var id:Number = evt.marker.patternId + 1;
+				if(!firstTime){
+					for (var i:Number = 0; i<modelNames.length; i++){
+						container = this.modelContainers[i];
+						id = evt.marker.patternId + 1;
+										
+						//trace('Pattern', evt.marker.patternId);
+						//trace('ID', container.id, 'patternId', evt.marker.patternId);
+						if(container.id == evt.marker.patternId){
+							if(container.visible != true){
+								if(lastID != container.id){									
+									// Remove models without marker
+									if(showed){
+										trace("IN showed!", idShow);
+										var pos:Number;
+										/*var c:DisplayObject3D = new DisplayObject3D();
+										c = this.modelContainers[idShow];
+										c.visible = false;
+										this.activeMarkers[idShow] = null;
+										this.modelContainers[idShow] = c;
+										showed = false;*/
+										for(var k:Number=0; k<modelNames.length; k++){
+											if(k != container.id){
+												var c:DisplayObject3D = new DisplayObject3D();
+												c = this.modelContainers[k];
+												c.visible = false;
+												this.activeMarkers[k] = null;
+												this.modelContainers[k] = c;
+												showed = false;
+											}
+										}
+									}
+									idShow = i;
+									var model:DAE = models[container.id];
+									vSlider.value = model.scale;
+									
+									//load pattern image
+									if(id >= 10){namePatt = "/resources/flar/patterns/patt0"+id+".png";}
+									else{namePatt = "/resources/flar/patterns/patt00"+id+".png";}
+									imPattern.load(namePatt);
+									imPattern.toolTip = modelTitles[id-1].toString().toLocaleUpperCase();
+									
+									//load similar patterns
+									var a:Array = new Array();
+									if(id <= 4){ //paintings
+										for(var j:Number=1; j<=4; j++){
+											if(j != id) {a.push(j);}	
+										}
+										img1.load("/resources/flar/patterns/patt00"+a[0]+".png");
+										img1.toolTip = modelTitles[a[0]-1].toString().toLocaleUpperCase();
+										img2.load("/resources/flar/patterns/patt00"+a[1]+".png");
+										img2.toolTip = modelTitles[a[1]-1].toString().toLocaleUpperCase();
+										img3.load("/resources/flar/patterns/patt00"+a[2]+".png");
+										img3.toolTip = modelTitles[a[2]-1].toString().toLocaleUpperCase();
+										/*img4.load("/resources/flar/patterns/patt00"+a[3]+".png");
+										img4.toolTip = modelTitles[a[3]-1].toString().toLocaleUpperCase();
+										img5.load("/resources/flar/patterns/patt00"+a[4]+".png");
+										img5.toolTip = modelTitles[a[4]-1].toString().toLocaleUpperCase();*/
+										img4.load();
+										img5.load();
+										playButton.visible = false;
+									}else if(id <= 8){ //words
+										for(j=5; j<=8; j++){
+											if(j != id) {a.push(j);}	
+										}
+										img1.load("/resources/flar/patterns/patt00"+a[0]+".png");
+										img1.toolTip = modelTitles[a[0]-1].toString().toLocaleUpperCase();
+										img2.load("/resources/flar/patterns/patt00"+a[1]+".png");
+										img2.toolTip = modelTitles[a[1]-1].toString().toLocaleUpperCase();
+										if(a[2] >= 10){img3.load("/resources/flar/patterns/patt0"+a[2]+".png");}
+											else{img3.load("/resources/flar/patterns/patt00"+a[2]+".png");}
+										img3.toolTip = modelTitles[a[2]-1].toString().toLocaleUpperCase();
+										/*img4.load("/resources/flar/patterns/patt0"+a[3]+".png");
+										img4.toolTip = modelTitles[a[3]-1].toString().toLocaleUpperCase();
+										img5.load("/resources/flar/patterns/patt0"+a[4]+".png");
+										img5.toolTip = modelTitles[a[4]-1].toString().toLocaleUpperCase();*/
+										img4.load();
+										img5.load();
+										playButton.visible = true;
+									}else{//buildings
+										for(j=9; j<=12; j++){
+											if(j != id) {a.push(j);}	
+										}
+										trace("array a",a);
+										if(a[0] >= 10){img1.load("/resources/flar/patterns/patt0"+a[0]+".png");}
+											else{img1.load("/resources/flar/patterns/patt00"+a[0]+".png");}
+										//img1.load("/resources/flar/patterns/patt0"+a[0]+".png");
+										img1.toolTip = modelTitles[a[0]-1].toString().toLocaleUpperCase();
+										img2.load("/resources/flar/patterns/patt0"+a[1]+".png");
+										img2.toolTip = modelTitles[a[1]-1].toString().toLocaleUpperCase();
+										img3.load("/resources/flar/patterns/patt0"+a[2]+".png");
+										img3.toolTip = modelTitles[a[2]-1].toString().toLocaleUpperCase();
+										/*img4.load("/resources/flar/patterns/patt0"+a[3]+".png");
+										img4.toolTip = modelTitles[a[3]-1].toString().toLocaleUpperCase();*/
+										img4.load();
+										img5.load();
+										playButton.visible = false;
+									}
+								}
+								lastID = container.id;
+								
+								//show model
+								//container.visible = true;
+								container.getChildByName("model"+i).visible = true;
+								showed = true;
+								//idShow = i;
+								
+								//show text information
+								infoText.htmlText = modelTextInfo[i].toString();
+								panelInfo.title = modelTitles[i].toString().toLocaleUpperCase();
+								panelInfo.visible = true;
+								infoText.visible = true;
+								//Reset zoom value
+								//vSlider.value = 20;
+								this.modelContainers[i] = container;
+								this.activeMarkers[i] = evt.marker;
+							}
+						}
+					}
+				}
+			}
+			
+			/**
+			 * Update model on marked updated.
+			 */
+			private function onMarkerUpdated (evt:FLARMarkerEvent) :void {
+				//trace("["+evt.marker.patternId+"] updated");
+				var container:DisplayObject3D = new DisplayObject3D();
+				for (var i:Number = 0; i<modelNames.length; i++){
+					container = this.modelContainers[i];
+					if(container.id == evt.marker.patternId){
+						// Remove models without marker
+						if(showed){
+							trace("IN showed!", idShow);
+							var pos:Number;
+							/*var c:DisplayObject3D = new DisplayObject3D();
+							c = this.modelContainers[idShow];
+							c.visible = false;
+							this.activeMarkers[idShow] = null;
+							this.modelContainers[idShow] = c;
+							showed = false;*/
+							for(var j:Number=0; j<modelNames.length; j++){
+								if(j != container.id){
+									var c:DisplayObject3D = new DisplayObject3D();
+									c = this.modelContainers[j];
+									c.visible = false;
+									this.activeMarkers[j] = null;
+									this.modelContainers[j] = c;
+									showed = false;
+								}
+							}
+						}
+						container.visible = true;
+						//panelInfo.visible = true;
+						//infoText.visible = true;
+						this.modelContainers[i] = container;
+						this.activeMarkers[i] = evt.marker;
+					}
+				}
+				
+			}
+			
+			/**
+			 * Remove model on marked removed.
+			 */
+			private function onMarkerRemoved (evt:FLARMarkerEvent) :void {
+				trace("["+evt.marker.patternId+"] removed");
+				var container:DisplayObject3D = new DisplayObject3D();
+				for (var i:Number = 0; i<modelNames.length; i++){
+					container = this.modelContainers[i];
+					if(container.id == evt.marker.patternId){						
+						//trace('IN removed!!!');
+						//hide model
+						//container.visible = false;
+						//hide information
+						//panelInfo.visible = false;
+						//infoText.visible = false;
+						//this.modelContainers[i] = container;
+						this.activeMarkers[i] = null;
+					}
+				}
+			}
+			
+			/**
+			 * Render model on enter frame.
+			 */
+			private function onEnterFrame (evt:Event) :void {
+				// apply the FLARToolkit transformation matrix to the Cube.
+				var container:DisplayObject3D = new DisplayObject3D();
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = this.activeMarkers[i];
+					if (actMarker){
+						container = this.modelContainers[i];
+						container.transform = FLARPVGeomUtils.convertFLARMatrixToPVMatrix(actMarker.transformMatrix);
+						modelContainers[i] = container;
+					}
+				}
+				
+				// update the Papervision3D view.
+				this.renderEngine.render();
+			}
+			
+			/**
+			 * Plays model sound on button pressed.
+			 */
+			private function playSound(name:String):void{
+			
+				var snd:Sound = new Sound();
+				var reqSnd:URLRequest = new URLRequest("../resources/assets/models/"+name.toLowerCase()+".mp3");
+				snd.addEventListener(IOErrorEvent.IO_ERROR, soundLoadError);
+				snd.load(reqSnd);
+				snd.play();
+			}
+			
+			private function soundLoadError(event:IOErrorEvent):void{
+				event.target.removeEventListener(Event.COMPLETE, soundLoadError);
+				trace("ERROR: Can't load "+panelInfo.title+".mp3");
+				Alert.show("Sorry! Can't load "+panelInfo.title+".mp3", "SOUND ERROR");
+			}
+			
+			private function changeZoom():void
+	      	{
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker || (i == idShow)){
+						model = models[i];
+						model.scale = vSlider.value;						
+					}
+	      		}
+	      	}
+	      	
+	      	private function changeXRotation():void
+	      	{
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker){
+						model = models[i];
+						//model.rotationX = h3Slider.value;
+					}
+				}
+	      	}
+	      	
+	      	private function changeYRotation():void
+	      	{
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker){
+						model = models[i];
+						//model.rotationY = h3Slider.value;
+					}
+				}
+	      	}
+	      	
+	      	private function changeZRotation():void
+	      	{
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker){
+						model = models[i];
+						//model.rotationZ = h3Slider.value;
+					}
+				}
+	      	}
+	      	
+	      	private function changeHorizontal(id:String):void
+	      	{
+	      		trace(id);
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker || (i == idShow)){
+						model = models[i];
+						if(id == "leftButton"){
+							model.y -= 5;
+						}else{model.y += 5;}
+						trace("Y: ", model.y);
+					}
+				}
+	      	}
+	      	
+	      	private function changeVertical(id:String):void
+	      	{
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker || (i == idShow)){
+						model = models[i];
+						if(id == "upButton"){
+							//model.z += 5;
+							model.x += 5;
+						}else{model.x -= 5;}
+						trace("X: ", model.x);
+						trace("Y: ", model.y);
+						trace("Z: ", model.z);
+					}
+				}
+	      	}
+	      	
+	      	private function changePosZ():void
+	      	{
+				var model:DAE;
+				var actMarker:FLARMarker;
+				for (var i:Number = 0; i<modelNames.length; i++){
+					actMarker = activeMarkers[i];
+					if (actMarker){
+						model = models[i];
+						//model.z = h2Slider.value;
+					}
+				}
+	      	}
+	      	
+	      	private function cleanSimilarPanel():void
+	      	{
+	      		var i:Image = new Image();
+	      		img1.load(i);img2.load(i);img3.load(i);img4.load(i);img5.load(i);imPattern.load(i);
+	      		lastID = -1;
+	      	}
+	      	
+	      	private function closeInfo():void
+	      	{
+	      		panelInfo.visible = false;
+	      		for(var i:Number=0; i<modelNames.length; i++){
+					var c:DisplayObject3D = new DisplayObject3D();
+					c = this.modelContainers[i];
+					c.visible = false;
+					this.modelContainers[i] = c;
+					this.activeMarkers[i] = null;
+					showed = false;
+					trace("REMOVE", idShow);
+				}
+	      	}
+			
+		]]>
+	</mx:Script>
+	
+	<!--
+	 - Scene components
+	 -->
+	 
+    <mx:Blur id="buttonEffect" blurXFrom="100" blurXTo="0" duration="500"/>
+     
+	<mx:Panel id="panelInfo" x="40" y="10" width="{Capabilities.screenResolutionX*0.40}" height="520" backgroundAlpha="0.25" borderColor="#323232" color="#5ED52B" 
+		fontStyle="italic" paddingTop="5" paddingLeft="10" paddingRight="10" paddingBottom="5">
+        
+        <mx:TextArea id="infoText" width="100%" height="100%" backgroundAlpha="0.75" color="black" 
+        			fontStyle="normal" selectable="false"/> 
+        
+        <mx:Button id="playButton" label="Play sound!" color="#ff3300" toggle="true" textAlign="center"
+        		 fontStyle="italic" fontSize="13" click="playSound(panelInfo.title);" buttonMode="true"/>
+        		 
+		 <mx:Button id="quitButton" label="Close" color="black" toggle="true" fontStyle="normal"
+        		  fontSize="10" click="closeInfo(); cleanSimilarPanel();" buttonMode="true"/>
+    </mx:Panel>
+    
+    <mx:Panel id="panelZoom" title="Zoom" fontSize="9" headerHeight="13" color="#5ED52B" x="{Capabilities.screenResolutionX*0.45}" y="560" width="100" height="100"
+    		  borderColor="#111111" visible="true" backgroundColor="#111111">
+        <mx:Box id="zoomBox" paddingLeft="10" paddingRight="10" paddingTop="5">
+	        <mx:VSlider id="vSlider" name="Zoom" minimum="0" maximum="40" value="20" height="{panelZoom.height*0.7}"
+	            dataTipPlacement="bottom" 
+	            tickColor="black" 
+	            snapInterval="1" tickInterval="40" 
+	            labels="['Min','','Max']" 
+	            allowTrackClick="true" 
+	            liveDragging="true"
+	            toolTip="Change zoom"
+	            buttonMode="true"
+	            change="changeZoom();"/>
+         </mx:Box>
+    </mx:Panel>
+    
+    <mx:Panel id="panelPosition" title="Position" fontSize="9" headerHeight="13" color="#5ED52B" x="{(Capabilities.screenResolutionX*0.45)}" y="{panelZoom.y+panelZoom.width+13}" width="100" height="100"
+    		  layout="absolute" borderColor="#111111" backgroundColor="#111111">
+        <mx:Button id="rightButton" icon="@Embed('resources/assets/buttonRight.jpg')" toolTip="Move right"
+					x="55" y="25" width="19" height="21" 
+					buttonMode="true" click="changeHorizontal(rightButton.id)"/>
+		<mx:Button id="leftButton" icon="@Embed('resources/assets/buttonLeft.jpg')" toolTip="Move left"
+					x="5" y="25" width="19" height="21"
+					buttonMode="true" click="changeHorizontal(leftButton.id)"/>
+		<mx:Button id="upButton" icon="@Embed('resources/assets/buttonUp.jpg')" toolTip="Move up"
+					x="30" y="5" width="21" height="19"
+					buttonMode="true" click="changeVertical(upButton.id)"/>
+		<mx:Button id="downButton" icon="@Embed('resources/assets/buttonDown.jpg')" toolTip="Move down"
+					x="30" y="50" width="21" height="19"
+					buttonMode="true" click="changeVertical(downButton.id)"/>
+    </mx:Panel>
+    
+    <mx:Resize id="resizePreloader" target="{imgBackPreloader}" widthTo="{Capabilities.screenResolutionX}" heightTo="{Capabilities.screenResolutionY}"/>
+    
+    <mx:Box id="boxPreloader">
+    	<mx:Image id="imgBackPreloader" updateComplete="resizePreloader.play()" source="@Embed('resources/assets/backgroundPreloader.jpg')"/>
+    </mx:Box>
+    
+    <mx:Resize id="resizeImg" target="{imPattern}" widthTo="75" heightTo="75"/>
+    <mx:Resize id="miniImg1" target="{img1}" widthTo="75" heightTo="75"/>
+    <mx:Resize id="miniImg2" target="{img2}" widthTo="75" heightTo="75"/>
+    <mx:Resize id="miniImg3" target="{img3}" widthTo="75" heightTo="75"/>
+    <mx:Resize id="miniImg4" target="{img4}" widthTo="75" heightTo="75"/>
+    <mx:Resize id="miniImg5" target="{img5}" widthTo="75" heightTo="75"/>
+   
+	<mx:Panel id="panelSimilar" title="Similar patterns" fontSize="9" headerHeight="13" color="#5ED52B" x="{panelZoom.x+panelZoom.width+220}" y="{panelZoom.y}"
+				 width="{660-(panelZoom.width+220)}" height="213" borderColor="#111111" visible="true" backgroundColor="#111111"
+				 paddingTop="15" paddingLeft="35">
+		<mx:VBox id="vBox">
+			<mx:HBox id="hBox1">
+				<mx:Image id="imPattern" updateComplete="resizeImg.play()"  toolTip="imPattern" />
+				<mx:Image id="img1" updateComplete="miniImg1.play()" alpha="0.5" toolTip="img1"/>
+				<mx:Image id="img2" updateComplete="miniImg2.play()" alpha="0.5" toolTip="img2"/>
+			</mx:HBox>
+			<mx:HBox id="hBox">
+				<mx:Image id="img3" updateComplete="miniImg3.play()" alpha="0.5" toolTip="img3"/>
+				<mx:Image id="img4" updateComplete="miniImg4.play()" alpha="0.5" toolTip="img4"/>
+				<mx:Image id="img5" updateComplete="miniImg5.play()" alpha="0.5" toolTip="img5"/>
+			</mx:HBox>
+		</mx:VBox>	
+	</mx:Panel>   
+</mx:UIComponent>

@@ -1,0 +1,5 @@
+roperty; the data model for items viewed in a list. The value of this property can be an array or any object that implements the DataProvider API. The default value is []. The List component and the ComboBox component share the dataProvider property, and changes to this property are immediately available to both components.
+
+The List component, like other data-aware components, adds methods to the Array object's prototype so that they conform to the DataProvider API (see DataProvider.as for details). Therefore, any array that exists at the same time as a list automatically has all the methods (addItem(), getItemAt(), and so on) needed for it to be the model of a list, and can be used to broadcast model changes to multiple components.
+
+If the array contains objects, the labelField or labelFunction property is accessed to determine what parts of the item to display. The default value is "label", so if such a field exists, it is chosen for display; if not, a comma-separated list of all fields is displayed. 

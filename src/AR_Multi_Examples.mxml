@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - AR_Multi_Examples
+ -
+ - AR examples. 
+ - @author		CoreLabs
+ -->
+ 
+<mx:WindowedApplication name="AR_Multi_Examples" xmlns:mx="http://www.adobe.com/2006/mxml" 
+						backgroundColor="#111111" showFlexChrome="false" layout="absolute"
+						applicationComplete="init();" frameRate="30" xmlns:local="*" >
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Image;
+			import mx.core.Application;
+			import org.papervision3d.objects.DisplayObject3D;
+			import flash.display.StageDisplayState;
+					
+			public function init():void{
+				// Setup FULL_SCREEN MODE
+				Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
+				//panelScene.visible=true;
+				sceneHolder._parent = this;
+				
+				// Init scene
+				sceneHolder.init();
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Box id="imageHeader" x="{sceneHolder.panelInfo.x}" y="{sceneHolder.panelInfo.height+40}" visible="false">
+		<mx:Image id="imHeader" source="@Embed('resources/assets/core.png')"/>
+	</mx:Box>
+		
+	<mx:Panel id="panelScene"  x="{Capabilities.screenResolutionX*0.45}" y="10" width="660" height="520" borderColor="#111111" visible="false">  
+       <local:SceneHolder id="sceneHolder" width="640" height="480"/>
+    </mx:Panel>
+</mx:WindowedApplication>

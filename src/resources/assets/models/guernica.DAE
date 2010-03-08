@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Administrador</author>
+      <authoring_tool>3dsMax 8 - Feeling ColladaMax v3.05B.</authoring_tool>
+      <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=1;ExportSelected=0;ExportTangents=0;ExportAnimations=0;SampleAnim=0;ExportAnimClip=0;BakeMatrices=0;ExportRelativePaths=1;AnimStart=0;AnimEnd=3.33333;</comments>
+    </contributor>
+    <created>2010-02-23T10:43:50Z</created>
+    <modified>2010-02-23T10:43:51Z</modified>
+    <unit meter="0.0254" name="inch"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images>
+    <image id="guernica.jpg" name="guernica_jpg">
+      <init_from>guernica.jpg</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="_9_-_Default" name="_9_-_Default">
+      <instance_effect url="#_9_-_Default-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="_9_-_Default-fx" name="_9_-_Default">
+      <profile_COMMON>
+        <newparam sid="guernica_jpg-surface">
+          <surface type="2D">
+            <init_from>guernica.jpg</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="guernica_jpg-sampler">
+          <sampler2D>
+            <source>guernica_jpg-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <blinn>
+            <ambient>
+              <color>0.588235 0.588235 0.588235 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="guernica_jpg-sampler" texcoord="CHANNEL1">
+                <extra>
+                  <technique profile="MAYA">
+                    <mirrorU>0</mirrorU>
+                    <mirrorV>0</mirrorV>
+                    <wrapU>1</wrapU>
+                    <wrapV>1</wrapV>
+                    <repeatU>1</repeatU>
+                    <repeatV>1</repeatV>
+                    <offsetU>0</offsetU>
+                    <offsetV>0</offsetV>
+                    <rotateUV>0</rotateUV>
+                  </technique>
+                  <technique profile="MAX3D">
+                    <amount>1</amount>
+                  </technique>
+                </extra>
+              </texture>
+            </diffuse>
+            <specular>
+              <color>0.9 0.9 0.9 1</color>
+            </specular>
+            <shininess>
+              <float>0.415939</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <reflectivity>
+              <float>1</float>
+            </reflectivity>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+          <extra>
+            <technique profile="FCOLLADA">
+              <spec_level>
+                <float>0</float>
+              </spec_level>
+              <emission_level>
+                <float>0</float>
+              </emission_level>
+            </technique>
+          </extra>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="MAX3D">
+          <faceted>0</faceted>
+          <double_sided>0</double_sided>
+          <wireframe>0</wireframe>
+          <face_map>0</face_map>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="objguernica-mesh" name="objguernica">
+      <mesh>
+        <source id="objguernica-mesh-positions">
+          <float_array id="objguernica-mesh-positions-array" count="48">-4.97905 0.000717 4.66285 4.97518 0.000717 0.896269 5.97315 -0.242661 0 -4.97905 0.000717 0.896269 -5.98089 0.242661 5.63232 5.97315 0.242661 5.63232 5.97315 0.242661 0 -5.98089 0.242661 0 5.39194 -0.242661 5.08028 -5.39969 -0.242661 5.08028 -5.98089 -0.242661 0 4.97518 0.000717 4.66285 -5.39969 -0.242661 0.515445 -5.98089 -0.242661 5.63232 5.39194 -0.242661 0.515445 5.97315 -0.242661 5.63232</float_array>
+          <technique_common>
+            <accessor source="#objguernica-mesh-positions-array" count="16" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="objguernica-mesh-normals">
+          <float_array id="objguernica-mesh-normals-array" count="252">0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -0.863887 -0.503685 0 -0.863887 -0.503685 0 -0.863887 -0.503685 0 -0.863887 -0.503685 0 -0.863887 -0.503685 0 -0.863887 -0.503685 0.500805 -0.86556 0 0.500805 -0.86556 0 0.500805 -0.86556 0 0.500805 -0.86556 0 0.500805 -0.86556 0 0.500805 -0.86556 0 0 -0.842622 0.538505 0 -0.842622 0.538505 0 -0.842622 0.538505 0 -0.842622 0.538505 0 -0.842622 0.538505 0 -0.842622 0.538505 -0.50428 -0.86354 0 -0.50428 -0.86354 0 -0.50428 -0.86354 0 -0.50428 -0.86354 0 -0.50428 -0.86354 0 -0.50428 -0.86354 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0</float_array>
+          <technique_common>
+            <accessor source="#objguernica-mesh-normals-array" count="84" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="objguernica-mesh-map-channel1">
+          <float_array id="objguernica-mesh-map-channel1-array" count="96">0.863091 0.164944 0 0.863091 0.836732 0 0.135292 0.836732 0 0.133723 0.165555 0 0.183567 0.089675 0 0.183567 0.089675 0 0.183567 0.089675 0 0.183567 0.089675 0 0.943323 0.944083 0 0.061359 0.944083 0 0.061359 0.064073 0 0.943323 0.064073 0 0.992944 0.992342 0 0.008141 0.992342 0 0.008141 0.005509 0 0.992944 0.005509 0 0.992377 0.992579 0 0.992377 0.94251 0 0.008025 0.94251 0 0.008025 0.992579 0 0.008165 0.005498 0 0.036346 0.005498 0 0.036415 0.992659 0 0.008234 0.992659 0 0.992377 0.992579 0 0.008025 0.992579 0 0.008025 0.94251 0 0.992377 0.94251 0 0.008165 0.005498 0 0.008234 0.992659 0 0.036415 0.992659 0 0.036346 0.005498 0</float_array>
+          <technique_common>
+            <accessor source="#objguernica-mesh-map-channel1-array" count="32" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="objguernica-mesh-vertices">
+          <input semantic="POSITION" source="#objguernica-mesh-positions"/>
+        </vertices>
+        <triangles material="_9_-_Default" count="28">
+          <input semantic="VERTEX" source="#objguernica-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#objguernica-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#objguernica-mesh-map-channel1" offset="2" set="1"/>
+          <p>1 0 0 11 1 1 0 2 2 1 3 0 0 4 2 3 5 3 4 6 4 5 7 5 6 8 6 4 9 4 6 10 6 7 11 7 8 12 8 9 13 9 0 14 2 8 15 8 0 16 2 11 17 1 9 18 9 12 19 10 3 20 3 9 21 9 3 22 3 0 23 2 12 24 10 14 25 11 1 26 0 12 27 10 1 28 0 3 29 3 14 30 11 8 31 8 11 32 1 14 33 11 11 34 1 1 35 0 15 36 12 13 37 13 9 38 9 15 39 12 9 40 9 8 41 8 13 42 13 10 43 14 12 44 10 13 45 13 12 46 10 9 47 9 10 48 14 2 49 15 14 50 11 10 51 14 14 52 11 12 53 10 2 54 15 15 55 12 8 56 8 2 57 15 8 58 8 14 59 11 4 60 16 13 61 17 15 62 18 4 63 16 15 64 18 5 65 19 7 66 20 10 67 21 13 68 22 7 69 20 13 70 22 4 71 23 7 72 24 6 73 25 2 74 26 7 75 24 2 76 26 10 77 27 6 78 28 5 79 29 15 80 30 6 81 28 15 82 30 2 83 31</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="unnamed_scene" name="unnamed_scene">
+      <node id="objguernica-node" name="objguernica" type="NODE">
+        <translate>0 0 0</translate>
+        <instance_geometry url="#objguernica-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="_9_-_Default" target="#_9_-_Default">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <extra>
+        <technique profile="FCOLLADA">
+          <start_time>0</start_time>
+          <end_time>3.33333</end_time>
+        </technique>
+      </extra>
+      <extra>
+        <technique profile="MAX3D">
+          <frame_rate>30</frame_rate>
+        </technique>
+      </extra>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#unnamed_scene"/>
+  </scene>
+</COLLADA>

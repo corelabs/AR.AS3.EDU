@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Administrador</author>
+      <authoring_tool>3dsMax 8 - Feeling ColladaMax v3.05B.</authoring_tool>
+      <comments>ColladaMax Export Options: ExportNormals=1;ExportEPolyAsTriangles=1;ExportXRefs=1;ExportSelected=0;ExportTangents=0;ExportAnimations=0;SampleAnim=0;ExportAnimClip=0;BakeMatrices=0;ExportRelativePaths=1;AnimStart=0;AnimEnd=3.33333;</comments>
+    </contributor>
+    <created>2010-02-02T06:41:18Z</created>
+    <modified>2010-02-02T06:41:20Z</modified>
+    <unit meter="0.0254" name="inch"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images>
+    <image id="hills.jpg" name="hills_jpg">
+      <init_from>./hills.jpg</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="_1_-_Default" name="_1_-_Default">
+      <instance_effect url="#_1_-_Default-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="_1_-_Default-fx" name="_1_-_Default">
+      <profile_COMMON>
+        <newparam sid="hills_jpg-surface">
+          <surface type="2D">
+            <init_from>hills.jpg</init_from>
+            <format>A8R8G8B8</format>
+          </surface>
+        </newparam>
+        <newparam sid="hills_jpg-sampler">
+          <sampler2D>
+            <source>hills_jpg-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NONE</minfilter>
+            <magfilter>NONE</magfilter>
+            <mipfilter>NONE</mipfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <blinn>
+            <ambient>
+              <color>0.588235 0.588235 0.588235 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="hills_jpg-sampler" texcoord="CHANNEL1">
+                <extra>
+                  <technique profile="MAYA">
+                    <mirrorU>0</mirrorU>
+                    <mirrorV>0</mirrorV>
+                    <wrapU>1</wrapU>
+                    <wrapV>1</wrapV>
+                    <repeatU>1</repeatU>
+                    <repeatV>1</repeatV>
+                    <offsetU>0</offsetU>
+                    <offsetV>0</offsetV>
+                    <rotateUV>0</rotateUV>
+                  </technique>
+                  <technique profile="MAX3D">
+                    <amount>1</amount>
+                  </technique>
+                </extra>
+              </texture>
+            </diffuse>
+            <specular>
+              <color>0.9 0.9 0.9 1</color>
+            </specular>
+            <shininess>
+              <float>0.415939</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <reflectivity>
+              <float>1</float>
+            </reflectivity>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+          <extra>
+            <technique profile="FCOLLADA">
+              <spec_level>
+                <float>0</float>
+              </spec_level>
+              <emission_level>
+                <float>0</float>
+              </emission_level>
+            </technique>
+          </extra>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="MAX3D">
+          <faceted>0</faceted>
+          <double_sided>0</double_sided>
+          <wireframe>0</wireframe>
+          <face_map>0</face_map>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="objShan-mesh" name="objShan">
+      <mesh>
+        <source id="objShan-mesh-positions">
+          <float_array id="objShan-mesh-positions-array" count="135">-4.97318 -0.00005 2.16634 4.97318 -0.00005 -2.16634 -4.97318 -0.00005 1.08317 3.72989 -0.00005 -2.16634 -4.97318 -0.00005 0 2.48659 -0.00005 -2.16634 -4.97318 -0.00005 -1.08317 1.2433 -0.00005 -2.16634 -4.97318 -0.00005 -2.16634 -3.72989 -0.00005 2.16634 1.2433 -0.00005 -1.08317 -3.72989 -0.00005 1.08317 2.48659 -0.00005 2.16634 -3.72989 -0.00005 0 1.2433 -0.00005 0 -3.72989 -0.00005 -1.08317 4.97318 -0.00005 2.16634 -3.72989 -0.00005 -2.16634 -2.48659 -0.00005 2.16634 4.97318 -0.00005 -1.08317 -2.48659 -0.00005 1.08317 3.72989 -0.00005 -1.08317 -2.48659 -0.00005 0 2.48659 -0.00005 -1.08317 -2.48659 -0.00005 -1.08317 1.2433 -0.00005 1.08317 -2.48659 -0.00005 -2.16634 -1.2433 -0.00005 2.16634 2.48659 -0.00005 0 -1.2433 -0.00005 1.08317 3.72989 -0.00005 2.16634 -1.2433 -0.00005 0 2.48659 -0.00005 1.08317 -1.2433 -0.00005 -1.08317 3.72989 -0.00005 1.08317 -1.2433 -0.00005 -2.16634 0 -0.00005 2.16634 4.97318 -0.00005 0 0 -0.00005 1.08317 3.72989 -0.00005 0 0 -0.00005 0 4.97318 -0.00005 1.08317 0 -0.00005 -1.08317 1.2433 -0.00005 2.16634 0 -0.00005 -2.16634</float_array>
+          <technique_common>
+            <accessor source="#objShan-mesh-positions-array" count="45" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="objShan-mesh-normals">
+          <float_array id="objShan-mesh-normals-array" count="576">0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#objShan-mesh-normals-array" count="192" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="objShan-mesh-map-channel1">
+          <float_array id="objShan-mesh-map-channel1-array" count="135">0.875 0.75 0 1 0.75 0 1 1 0 0.875 1 0 0.75 0.75 0 0.75 1 0 0.75 0.5 0 0.875 0.5 0 1 0.5 0 0.625 0.25 0 0.75 0.25 0 0.625 0.5 0 0.875 0.25 0 1 0.25 0 0.5 0 0 0.625 0 0 0.5 0.25 0 0.875 0 0 1 0 0 0.625 0.75 0 0.625 1 0 0.5 0.75 0 0.5 1 0 0.5 0.5 0 0.375 0 0 0.375 0.25 0 0.75 0 0 0.375 0.75 0 0.375 1 0 0.25 0.75 0 0.25 1 0 0.375 0.5 0 0.25 0.5 0 0.25 0.25 0 0.25 0 0 0.125 0.75 0 0.125 1 0 0 0.75 0 0 1 0 0.125 0.5 0 0 0.5 0 0.125 0.25 0 0 0.25 0 0.125 0 0 0 0 0</float_array>
+          <technique_common>
+            <accessor source="#objShan-mesh-map-channel1-array" count="45" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="objShan-mesh-vertices">
+          <input semantic="POSITION" source="#objShan-mesh-positions"/>
+        </vertices>
+        <triangles material="_1_-_Default" count="64">
+          <input semantic="VERTEX" source="#objShan-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#objShan-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#objShan-mesh-map-channel1" offset="2" set="1"/>
+          <p>34 0 0 41 1 1 16 2 2 34 3 0 16 4 2 30 5 3 32 6 4 34 7 0 30 8 3 32 9 4 30 10 3 12 11 5 28 12 6 39 13 7 34 14 0 28 15 6 34 16 0 32 17 4 41 18 1 34 19 0 39 20 7 41 21 1 39 22 7 37 23 8 10 24 9 23 25 10 28 26 6 10 27 9 28 28 6 14 29 11 21 30 12 19 31 13 37 32 8 21 33 12 37 34 8 39 35 7 44 36 14 7 37 15 10 38 9 44 39 14 10 40 9 42 41 16 3 42 17 1 43 18 19 44 13 3 45 17 19 46 13 21 47 12 25 48 19 32 49 4 12 50 5 25 51 19 12 52 5 43 53 20 38 54 21 25 55 19 43 56 20 38 57 21 43 58 20 36 59 22 14 60 11 28 61 6 32 62 4 14 63 11 32 64 4 25 65 19 40 66 23 14 67 11 25 68 19 40 69 23 25 70 19 38 71 21 42 72 16 10 73 9 14 74 11 42 75 16 14 76 11 40 77 23 39 78 7 28 79 6 23 80 10 39 81 7 23 82 10 21 83 12 35 84 24 44 85 14 42 86 16 35 87 24 42 88 16 33 89 25 23 90 10 10 91 9 7 92 15 23 93 10 7 94 15 5 95 26 29 96 27 38 97 21 36 98 22 29 99 27 36 100 22 27 101 28 20 102 29 29 103 27 27 104 28 20 105 29 27 106 28 18 107 30 31 108 31 40 109 23 38 110 21 31 111 31 38 112 21 29 113 27 22 114 32 31 115 31 29 116 27 22 117 32 29 118 27 20 119 29 33 120 25 42 121 16 40 122 23 33 123 25 40 124 23 31 125 31 24 126 33 33 127 25 31 128 31 24 129 33 31 130 31 22 131 32 21 132 12 23 133 10 5 134 26 21 135 12 5 136 26 3 137 17 26 138 34 35 139 24 33 140 25 26 141 34 33 142 25 24 143 33 11 144 35 20 145 29 18 146 30 11 147 35 18 148 30 9 149 36 2 150 37 11 151 35 9 152 36 2 153 37 9 154 36 0 155 38 13 156 39 22 157 32 20 158 29 13 159 39 20 160 29 11 161 35 2 162 37 4 163 40 13 164 39 2 165 37 13 166 39 11 167 35 15 168 41 24 169 33 22 170 32 15 171 41 22 172 32 13 173 39 4 174 40 6 175 42 15 176 41 4 177 40 15 178 41 13 179 39 17 180 43 26 181 34 24 182 33 17 183 43 24 184 33 15 185 41 6 186 42 8 187 44 17 188 43 6 189 42 17 190 43 15 191 41</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="unnamed_scene" name="unnamed_scene">
+      <node id="objShan-node" name="objShan" type="NODE">
+        <translate>0 0.00005 0</translate>
+        <instance_geometry url="#objShan-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="_1_-_Default" target="#_1_-_Default">
+                <bind_vertex_input semantic="CHANNEL1" input_semantic="TEXCOORD" input_set="1"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+      <extra>
+        <technique profile="FCOLLADA">
+          <start_time>0</start_time>
+          <end_time>3.33333</end_time>
+        </technique>
+      </extra>
+      <extra>
+        <technique profile="MAX3D">
+          <frame_rate>30</frame_rate>
+        </technique>
+      </extra>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#unnamed_scene"/>
+  </scene>
+</COLLADA>
